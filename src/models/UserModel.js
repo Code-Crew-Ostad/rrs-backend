@@ -4,8 +4,9 @@ const DataSchema=mongoose.Schema({
         firstName:{type:String,lowercase:true,required:false, default:""},
         lastName:{type:String,lowercase:true,required:false,default:""},
         mobileNo:{type:String,required:false,unique:true,default:""},
-        restaurantOwner:{type:Boolean, required: true, default: false},
+        userType:{type:String, required: true},
         email:{type:String,lowercase:true,required:true,unique:true},
+        password:{type:String,required:true,default:""},
         otp:{type:String,required:true},
     },
     {timestamps:true,versionKey:false}

@@ -2,19 +2,22 @@ const UserModel = require("../models/UserModel");
 const SendEmailUtility = require("../utility/SendEmail");
 const {EncodeToken} = require("../utility/TokenHelper");
 
-const UserOTP = async (req)=>{
+const UserRegisterService = async (req)=>{
     try{
         let email=req.params.email;
         let reqBody = req.body;
-        let {firstName, lastName, mobileNo, restaurantOwner} = reqBody;
+        let {firstName, lastName, mobileNo, userType, password} = reqBody;
         let code=Math.floor(100000 + Math.random() * 900000);
         let EmailText="Your verification code is "+code;
         await SendEmailUtility(email,EmailText,"PIN Email Verification");
         await UserModel.updateOne({firstName:firstName,
                                     lastName:lastName,
                                     mobileNo:mobileNo,
-                                    restaurantOwner:restaurantOwner,
-                                    email:email}, {$set:{otp:code}}, {upsert:true})
+                                    userType:userType,
+                                    email:email,
+                                    password:password}, 
+                                    {$set:{otp:code}}, 
+                                    {upsert:true})
         return {status:"success", message:"6 Digit OTP has been send"}
     }
     catch (e) {
@@ -22,10 +25,11 @@ const UserOTP = async (req)=>{
     }
 }
 
-const UserVerify = async (req)=>{
+const VerifyRegisterService= async (req)=>{
     try{
         let email=req.params.email;
         let code=req.params.otp;
+        let password = req.body.password
         if(code==="0"){
             return {status:"fail", message:"Something Went Wrong"}
         }
@@ -34,7 +38,7 @@ const UserVerify = async (req)=>{
             if(total===1){
                 let user_id=await UserModel.find({email: email, otp: code}).select('_id')
                 let token= EncodeToken(email,user_id[0]['_id'].toString())
-                await UserModel.updateOne({email:email}, {$set:{otp:'0'}}, {upsert:true})
+                await UserModel.updateOne({email:email}, {$set:{otp:'0', password:password}}, {upsert:true})
                 return {status:"success", message:"Valid OTP", token:token}
             }else{
                 return {status:"fail", message:"Something Went Wrong"}
@@ -75,4 +79,4 @@ const UserVerify = async (req)=>{
 
 
 // module.exports = {UserOTP,UserVerify,UserProfileSave,UserProfileDetails};
-module.exports = {UserOTP,UserVerify};
+module.exports = {UserRegisterService,VerifyRegisterService};

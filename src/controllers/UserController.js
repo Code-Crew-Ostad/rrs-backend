@@ -1,12 +1,12 @@
-const {UserOTP,UserVerify} = require("../services/UserService");
+const {UserRegisterService,VerifyRegisterService} = require("../services/UserService");
 
-exports.UserLogin=async (req,res)=>{
-    let result=  await UserOTP(req)
+exports.UserRegistration=async (req,res)=>{
+    let result=  await UserRegisterService(req)
     return res.status(200).json(result)
 }
 
-exports.VerifyLogin=async (req,res)=>{
-    let result=  await UserVerify(req);
+exports.VerifyRegistration=async (req,res)=>{
+    let result=  await VerifyRegisterService(req);
     if(result['status']==="success"){
 
         let cookieOption={
