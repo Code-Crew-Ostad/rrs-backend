@@ -11,13 +11,13 @@ exports.UserRegistration= async (req, res, next)=>{
         let genCode=Math.floor(100000 + Math.random() * 900000);
         let emailText="Your verification code is "+genCode;
         //Saving the user
-         const newUser = new UserModel({...req.body, otp:genCode})
-         await newUser.save();
+        // const newUser = new UserModel({...req.body, otp:genCode})
+        // await newUser.save();
 
         
-        //const savedUser = await UserModel.updateOne({otp:genCode}, {$set:req.body}, {upsert:true});
+        const savedUser = await UserModel.updateOne({otp:genCode}, {$set:req.body}, {upsert:true});
         //Sending Email
-        //await SendEmailUtility(req.body.email,emailText,"PIN Email Verification");
+        await SendEmailUtility(req.body.email,emailText,"PIN Email Verification");
         res.status(200).json({status:"success", message:"A 6 digit code has been sent to your email", data:savedUser})
     } catch (error) {
         next(error)
