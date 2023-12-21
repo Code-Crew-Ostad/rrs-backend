@@ -17,7 +17,7 @@ exports.UserRegistration= async (req, res, next)=>{
         
         const savedUser = await UserModel.updateOne({otp:genCode}, {$set:req.body}, {upsert:true});
         //Sending Email
-        await SendEmailUtility(req.body.email,emailText,"PIN Email Verification");
+        //await SendEmailUtility(req.body.email,emailText,"PIN Email Verification");
         res.status(200).json({status:"success", message:"A 6 digit code has been sent to your email", data:savedUser})
     } catch (error) {
         next(error)
