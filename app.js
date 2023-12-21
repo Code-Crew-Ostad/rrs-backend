@@ -30,20 +30,13 @@ cloudinary.config({
 });
 
 app.use(cookieParser());
-// app.use(cors())
+app.use(cors())
 app.use(helmet())
 app.use(mongoSanitize())
 app.use(xss())
 app.use(hpp())
 
 app.use(express.json());
-
-app.options('/api/v1/UserRegistration', cors());
-app.use(cors({
-    origin: 'https://get-rest.vercel.app',
-    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
-    allowedHeaders: 'Content-Type',
-  }));
 
 
 const limiter= rateLimit({windowMs:15*60*1000,max:3000})
