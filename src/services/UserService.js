@@ -6,13 +6,13 @@ const UserRegisterService = async (req)=>{
     try{
         let email=req.params.email;
         let reqBody = req.body;
-        let {firstName, lastName, mobileNo, userType, password} = reqBody;
+        let {firstName, lastName,  userType, password} = reqBody;
         let code=Math.floor(100000 + Math.random() * 900000);
         let EmailText="Your verification code is "+code;
         await SendEmailUtility(email,EmailText,"PIN Email Verification");
         await UserModel.updateOne({firstName:firstName,
                                     lastName:lastName,
-                                    mobileNo:mobileNo,
+
                                     userType:userType,
                                     email:email,
                                     password:password}, 

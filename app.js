@@ -10,8 +10,10 @@ const hpp =require('hpp');
 const cors =require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose =require('mongoose');
+const cloudinary = require('cloudinary').v2;
 const path = require("path");
 
+// Connecting to Database
 let URL="mongodb+srv://<username>:<password>@cluster0.9pvozuw.mongodb.net/restaurant-reservation-db?retryWrites=true&w=majority";
 let option={user:'codecrew',pass:"Ostad2023",autoIndex:true};
 mongoose.connect(URL,option).then((res)=>{
@@ -20,6 +22,12 @@ mongoose.connect(URL,option).then((res)=>{
     console.log(err)
 })
 
+// Configuring Cloudinary
+cloudinary.config({
+    cloud_name: 'dxnybnujt',
+    api_key: '896672376795931',
+    api_secret: '7b2tc_9WGdGfNExao9fP2yHV_8k',
+});
 
 app.use(cookieParser());
 app.use(cors())
@@ -28,8 +36,7 @@ app.use(mongoSanitize())
 app.use(xss())
 app.use(hpp())
 
-app.use(express.json({limit: '50mb'}));
-app.use(express.urlencoded({limit: '50mb'}));
+app.use(express.json());
 
 
 const limiter= rateLimit({windowMs:15*60*1000,max:3000})
@@ -37,6 +44,17 @@ app.use(limiter)
 
 
 app.use("/api/v1",router)
+
+app.use((error, req, res, next)=>{
+    const errorStatus = error.status || 500;
+    const errorMessage = error.message || "Something went wrong!"
+    return res.status(errorStatus).json({
+        success: false,
+        status: errorStatus,
+        messsage: errorMessage,
+        stack: error.stack,
+    });
+});
 
 // app.get("/", function (req, res) {
 //     res.send("hello World");
