@@ -31,18 +31,18 @@ exports.VerifyRegistration= async (req,res, next)=>{
         let otp=req.body.otp;
         let password = req.body.password
         //------------
-        console.log(req.body)
+        //console.log(req.body)
         // Hashing the password
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(password, salt);
 
-        if(otp==="0"){
-            return res.status(500).json({status:"fail", message:"Something Went Wrong"});
-        }
-        else {
+        // if(otp==="0"){
+        //     return res.status(500).json({status:"fail", message:"Something Went Wrong"});
+        // }
+        // else {
             let total=await UserModel.find({email: email, otp: otp}).count('total');
             //------------
-            console.log(total)
+            //console.log(total)
 
             if(total !== 1){
                 return res.status(500).json({status:"fail", message:"Something Went Wrong"});
@@ -52,7 +52,7 @@ exports.VerifyRegistration= async (req,res, next)=>{
                 let token= EncodeToken(email,user_id[0]['_id'].toString())
                 const result =await UserModel.updateOne({email:email}, {$set:{otp:'0', password:hash}}, {upsert:true})
                 //------------
-                console.log(result)
+                //console.log(result)
                 //Cookie Creation    
                 if(result['matchedCount'] == 1){
                     let cookieOption={
@@ -63,7 +63,7 @@ exports.VerifyRegistration= async (req,res, next)=>{
                 }
                 return res.status(200).json({status:"success", message:"Valid OTP", token:token, type:user_id[0]['userType'], email:email})
             }
-        } 
+        // } 
     } catch (error) {
             next(error)
     }
