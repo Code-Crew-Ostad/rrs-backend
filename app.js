@@ -38,13 +38,11 @@ app.use(hpp())
 
 app.use(express.json());
 
-    // Cors
-const corsOptions = {
-    origin: '*',
-    credentials: true,
-    optionSuccessStatus: 200
-    }
-    app.use(cors(corsOptions))
+app.use(cors({
+    origin: 'https://get-rest.vercel.app',
+    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
+    allowedHeaders: 'Content-Type',
+  }));
 
 
 const limiter= rateLimit({windowMs:15*60*1000,max:3000})
