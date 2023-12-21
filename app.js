@@ -38,6 +38,7 @@ app.use(hpp())
 
 app.use(express.json());
 
+app.options('/api/v1/UserRegistration', cors());
 app.use(cors({
     origin: 'https://get-rest.vercel.app',
     methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
