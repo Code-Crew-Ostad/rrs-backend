@@ -30,13 +30,21 @@ cloudinary.config({
 });
 
 app.use(cookieParser());
-app.use(cors())
+// app.use(cors())
 app.use(helmet())
 app.use(mongoSanitize())
 app.use(xss())
 app.use(hpp())
 
 app.use(express.json());
+
+    // Cors
+const corsOptions = {
+    origin: '*',
+    credentials: true,
+    optionSuccessStatus: 200
+    }
+    app.use(cors(corsOptions))
 
 
 const limiter= rateLimit({windowMs:15*60*1000,max:3000})
