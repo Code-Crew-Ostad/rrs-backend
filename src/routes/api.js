@@ -24,6 +24,7 @@ const multer = require("multer");
 const storage = multer.memoryStorage(); // Use memory storage for handling files
 const upload = multer({ storage: storage });
 
+
 // User
 router.get("/UserLogout", AuthVerification, UserController.UserLogout);
 router.post("/UserRegistration", UserController.UserRegistration);
