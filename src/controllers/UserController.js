@@ -10,12 +10,13 @@ exports.UserRegistration= async (req, res, next)=>{
         //Generating OTP
         let genCode=Math.floor(100000 + Math.random() * 900000);
         let emailText="Your verification code is "+genCode;
+        req.body.otp = genCode;
         //Saving the user
         // const newUser = new UserModel({...req.body, otp:genCode})
         // await newUser.save();
 
         
-        const savedUser = await UserModel.updateOne({otp:genCode}, {$set:req.body}, {upsert:true});
+        const savedUser = await UserModel.updateOne({otp:req.body.otp}, {$set:req.body}, {upsert:true});
         //Sending Email
         await SendEmailUtility(req.body.email,emailText,"PIN Email Verification");
         res.status(200).json({status:"success", message:"A 6 digit code has been sent to your email", data:savedUser})
@@ -36,34 +37,37 @@ exports.VerifyRegistration= async (req,res, next)=>{
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(password, salt);
 
-        // if(otp==="0"){
-        //     return res.status(500).json({status:"fail", message:"Something Went Wrong"});
-        // }
-        // else {
+        if(otp==="0"){
+            return res.status(500).json({status:"fail", message:"Something Went Wrong"});
+        }
+        else {
             let total=await UserModel.find({email: email, otp: otp}).count('total');
             //------------
-            //console.log(total)
+            console.log(total)
 
-            if(total !== 1){
-                return res.status(500).json({status:"fail", message:"Something Went Wrong"});
-            }else{
-                
-                let user_id=await UserModel.find({email: email, otp: otp}).select({'_id':1,'userType':1})
-                let token= EncodeToken(email,user_id[0]['_id'].toString())
-                const result =await UserModel.updateOne({email:email}, {$set:{otp:'0', password:hash}}, {upsert:true})
-                //------------
-                //console.log(result)
-                //Cookie Creation    
-                if(result['matchedCount'] == 1){
-                    let cookieOption={
-                    expires  : new Date(Date.now()+24*60*60*1000),
-                    httpOnly : false
-                    }
-                    res.cookie('token', token,cookieOption)
+            if(total == 1){
+                    await UserModel.updateOne({email:email}, {$set:{otp:'0', password:hash}}, {upsert:true})
+                    return res.status(200).json({status:"success", message:"Valid OTP"})
                 }
-                return res.status(200).json({status:"success", message:"Valid OTP", token:token, type:user_id[0]['userType'], email:email})
+            else
+                {
+                
+               // let user_id=await UserModel.find({email: email, otp: otp}).select({'_id':1,'userType':1})
+                //let token= EncodeToken(email,user_id[0]['_id'].toString())
+                return res.status(500).json({status:"fail", message:"Something Went Wrong"});
+                //------------
+                
+                //Cookie Creation    
+                // if(result['matchedCount'] == 1){
+                //     let cookieOption={
+                //     expires  : new Date(Date.now()+24*60*60*1000),
+                //     httpOnly : false
+                //     }
+                //     res.cookie('token', token,cookieOption)
+                // }
+                //return res.status(200).json({status:"success", message:"Valid OTP", token:token, type:user_id[0]['userType'], email:email})
             }
-        // } 
+        } 
     } catch (error) {
             next(error)
     }
